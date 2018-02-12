@@ -25,28 +25,28 @@ class StocksSpider(scrapy.Spider):
                 continue
         
         '''反馈信息最终提交给pipeline，所以生成一个字典'''
-        def parse_stock(self,response):
-            infoDict = {}
-            #stockInfo = response.css('.stock-bets')
-            stockInfo = response.css('div::attr(stock-bets)')
-            name = stockInfo.css('.bets-name').extract()[0]
-            keyList = stockInfo.css('dt').extract()
-            valueList = stockInfo.css('dd').extract()
-            #将提取的信息保存在字典中
-            for i in range(len(keyList)):
-                key = re.findall(r'>.*</dt>',keyList[i])[0][1:-5]#找到所有的，提取第0个，
-                #上面可以试试用find
-                try :
-                    val = re.findall(r'\d+\.?*</dd>',valueList[i])[0][0:-5]
-                except :
-                    val = '找不到参数'
-                infoDict[key] = val
+    def parse_stock(self,response):
+        infoDict = {}
+        #stockInfo = response.css('.stock-bets')
+        stockInfo = response.css('div::attr(stock-bets)')
+        name = stockInfo.css('.bets-name').extract()[0]
+        keyList = stockInfo.css('dt').extract()
+        valueList = stockInfo.css('dd').extract()
+        #将提取的信息保存在字典中
+        for i in range(len(keyList)):
+            key = re.findall(r'>.*</dt>',keyList[i])[0][1:-5]#找到所有的，提取第0个，
+            #上面可以试试用find
+            try :
+                val = re.findall(r'\d+\.?*</dd>',valueList[i])[0][0:-5]
+            except :
+                val = '找不到参数'
+            infoDict[key] = val
 
-            infoDict.update(
-                {'股票名称':re.findall('\s.*\(',name)[0].split()[0] +\
-                 re.findall(r'>.*<',name)[0][1:-1]})
-            '''
-            然后将得到的信息交给pipeline
-            '''
-            yield infoDict#生成器
+        infoDict.update(
+            {'股票名称':re.findall('\s.*\(',name)[0].split()[0] +\
+                re.findall(r'>.*<',name)[0][1:-1]})
+        '''
+        然后将得到的信息交给pipeline
+        '''
+        yield infoDict#生成器
 
